@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  destination: one
+  departure_date: 2026-02-16 11:43:40
+  departure_location: MyString
+  available_seats: 1
+  price_per_seat: 9.99
+  description: MyText
+  status: 1
+
+two:
+  user: two
+  destination: two
+  departure_date: 2026-02-16 11:43:40
+  departure_location: MyString
+  available_seats: 1
+  price_per_seat: 9.99
+  description: MyText
+  status: 1

@@ -1,0 +1,283 @@
+<!-- Hero Section -->
+<div class="hero-section text-white mb-5">
+  <div class="hero-content text-center">
+    <h1 class="display-4 mb-3">
+      <i class="bi bi-mountain"></i> Climber
+    </h1>
+    <p class="lead mb-4">Share rides to the best climbing and hiking spots</p>
+    <p class="mb-4">Join our community of outdoor enthusiasts. Save money, make friends, and reduce your carbon footprint.</p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <%= link_to trips_path, class: "btn btn-light btn-lg px-4" do %>
+        <i class="bi bi-search me-2"></i>Find a Ride
+      <% end %>
+      <% if user_signed_in? %>
+        <%= link_to new_trip_path, class: "btn btn-outline-light btn-lg px-4" do %>
+          <i class="bi bi-car-front me-2"></i>Offer a Ride
+        <% end %>
+      <% else %>
+        <%= link_to new_user_registration_path, class: "btn btn-outline-light btn-lg px-4" do %>
+          <i class="bi bi-person-plus me-2"></i>Join Now
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Activity Cards -->
+<div class="row mb-5 g-4">
+  <div class="col-md-6">
+    <div class="card activity-card climbing h-100">
+      <div class="card-body text-center py-5">
+        <div class="activity-icon">
+          <i class="bi bi-signpost-split"></i>
+        </div>
+        <h3 class="fw-bold mb-3">Climbing</h3>
+        <p class="mb-4">Find rides to <%= @climbing_count %> climbing destinations including La Pedriza, Patones, La Cabrera, and more.</p>
+        <%= link_to trips_path(activity_type: "climbing"), class: "btn btn-light btn-lg" do %>
+          <i class="bi bi-arrow-right me-2"></i>Explore Climbing Trips
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card activity-card hiking h-100">
+      <div class="card-body text-center py-5">
+        <div class="activity-icon">
+          <i class="bi bi-tree"></i>
+        </div>
+        <h3 class="fw-bold mb-3">Hiking</h3>
+        <p class="mb-4">Find rides to <%= @hiking_count %> hiking destinations including Penalara, Siete Picos, El Yelmo, and more.</p>
+        <%= link_to trips_path(activity_type: "hiking"), class: "btn btn-light btn-lg" do %>
+          <i class="bi bi-arrow-right me-2"></i>Explore Hiking Trips
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upcoming Trips Section -->
+<div class="mb-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">
+      <i class="bi bi-calendar-event me-2 text-primary"></i>Upcoming Trips
+    </h2>
+    <%= link_to trips_path, class: "btn btn-outline-primary" do %>
+      View All <i class="bi bi-arrow-right ms-1"></i>
+    <% end %>
+  </div>
+
+  <% if @featured_trips.any? %>
+    <div class="row g-4">
+      <% @featured_trips.each do |trip| %>
+        <div class="col-md-6 col-lg-4">
+          <div class="card trip-card h-100">
+            <div class="position-relative" style="height: 180px; overflow: hidden;">
+              <% if trip.display_image_url.present? %>
+                <img src="<%= trip.display_image_url %>" alt="<%= trip.display_name %>" style="width: 100%; height: 100%; object-fit: cover;">
+              <% else %>
+                <div class="<%= trip.climbing? ? 'climbing-bg' : 'hiking-bg' %> h-100 d-flex align-items-center justify-content-center">
+                  <i class="bi <%= trip.climbing? ? 'bi-signpost-split' : 'bi-tree' %>" style="font-size: 4rem; color: rgba(255,255,255,0.8);"></i>
+                </div>
+              <% end %>
+              <span class="badge bg-light text-dark position-absolute" style="top: 12px; right: 12px;">
+                <i class="bi bi-people-fill me-1"></i><%= trip.seats_remaining %> seats
+              </span>
+              <span class="badge <%= trip.climbing? ? 'bg-warning' : 'bg-success' %> position-absolute" style="bottom: 12px; left: 12px;">
+                <i class="bi <%= trip.climbing? ? 'bi-signpost-split' : 'bi-tree' %> me-1"></i>
+                <%= trip.climbing? ? 'Climbing' : 'Hiking' %>
+              </span>
+            </div>
+            <div class="trip-details">
+              <h5 class="trip-title"><%= trip.display_name %></h5>
+              <div class="mb-2">
+                <% if trip.join_activity? %>
+                  <span class="badge bg-success"><i class="bi bi-person-walking me-1"></i>Driver joins</span>
+                <% else %>
+                  <span class="badge bg-secondary"><i class="bi bi-car-front me-1"></i>Ride only</span>
+                <% end %>
+              </div>
+              <div class="trip-info">
+                <i class="bi bi-calendar3"></i>
+                <span><%= trip.departure_date.strftime("%A, %B %d") %></span>
+              </div>
+              <div class="trip-info">
+                <i class="bi bi-clock"></i>
+                <span><%= trip.departure_date.strftime("%H:%M") %></span>
+              </div>
+              <div class="trip-info">
+                <i class="bi bi-geo-alt"></i>
+                <span><%= trip.departure_location %></span>
+              </div>
+              <div class="trip-info">
+                <i class="bi bi-person"></i>
+                <span>Driver: <%= trip.driver.name %></span>
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="trip-price">
+                  <%= number_to_currency(trip.price_per_seat, unit: "\u20AC", precision: 0) %>
+                  <small>/seat</small>
+                </div>
+                <%= link_to trip, class: "btn btn-primary" do %>
+                  View <i class="bi bi-arrow-right ms-1"></i>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="card">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-calendar-x text-muted" style="font-size: 4rem;"></i>
+        <h4 class="mt-3">No Upcoming Trips</h4>
+        <p class="text-muted mb-4">Be the first to offer a ride to your favorite destination!</p>
+        <% if user_signed_in? %>
+          <%= link_to new_trip_path, class: "btn btn-primary btn-lg" do %>
+            <i class="bi bi-plus-circle me-2"></i>Offer a Ride
+          <% end %>
+        <% else %>
+          <%= link_to new_user_registration_path, class: "btn btn-primary btn-lg" do %>
+            <i class="bi bi-person-plus me-2"></i>Sign Up to Offer
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<!-- Features Section -->
+<div class="mb-5">
+  <h2 class="fw-bold text-center mb-4">
+    <i class="bi bi-stars me-2 text-warning"></i>Why Choose Climber?
+  </h2>
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="feature-box h-100">
+        <div class="feature-icon icon-green">
+          <i class="bi bi-cash-coin"></i>
+        </div>
+        <h4>Save Money</h4>
+        <p>Split fuel costs with fellow adventurers. Set your own price per seat.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="feature-box h-100">
+        <div class="feature-icon icon-orange">
+          <i class="bi bi-people"></i>
+        </div>
+        <h4>Meet People</h4>
+        <p>Connect with like-minded climbers and hikers. Make new friends on every trip.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="feature-box h-100">
+        <div class="feature-icon icon-blue">
+          <i class="bi bi-globe-europe-africa"></i>
+        </div>
+        <h4>Go Green</h4>
+        <p>Reduce your carbon footprint by sharing rides to the mountains.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- How It Works -->
+<div class="card mb-5">
+  <div class="card-body py-5">
+    <h2 class="fw-bold text-center mb-5">
+      <i class="bi bi-info-circle me-2 text-info"></i>How It Works
+    </h2>
+    <div class="row g-4 text-center">
+      <div class="col-md-3">
+        <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+          1
+        </div>
+        <h5 class="fw-bold">Sign Up</h5>
+        <p class="text-muted small">Create your free account in seconds</p>
+      </div>
+      <div class="col-md-3">
+        <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+          2
+        </div>
+        <h5 class="fw-bold">Find or Offer</h5>
+        <p class="text-muted small">Search for rides or create your own</p>
+      </div>
+      <div class="col-md-3">
+        <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+          3
+        </div>
+        <h5 class="fw-bold">Book & Connect</h5>
+        <p class="text-muted small">Reserve your seat and meet your driver</p>
+      </div>
+      <div class="col-md-3">
+        <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+          4
+        </div>
+        <h5 class="fw-bold">Enjoy!</h5>
+        <p class="text-muted small">Have an amazing day outdoors</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Popular Destinations Preview -->
+<div class="mb-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">
+      <i class="bi bi-pin-map me-2 text-danger"></i>Popular Destinations
+    </h2>
+    <%= link_to destinations_path, class: "btn btn-outline-primary" do %>
+      View All <i class="bi bi-arrow-right ms-1"></i>
+    <% end %>
+  </div>
+  <div class="row g-4">
+    <% Destination.limit(4).each do |destination| %>
+      <div class="col-md-6 col-lg-3">
+        <%= link_to destination, class: "text-decoration-none" do %>
+          <div class="card destination-card h-100">
+            <div class="position-relative" style="height: 150px; overflow: hidden;">
+              <% if destination.image_url.present? %>
+                <img src="<%= destination.image_url %>" alt="<%= destination.name %>" style="width: 100%; height: 100%; object-fit: cover;">
+              <% else %>
+                <div class="<%= destination.climbing? ? 'climbing-bg' : 'hiking-bg' %> h-100 d-flex align-items-center justify-content-center">
+                  <i class="bi <%= destination.climbing? ? 'bi-signpost-split' : 'bi-tree' %>" style="font-size: 3rem; color: rgba(255,255,255,0.8);"></i>
+                </div>
+              <% end %>
+              <% if destination.difficulty_level.present? %>
+                <span class="badge bg-dark position-absolute" style="top: 8px; right: 8px; font-size: 0.7rem;"><%= destination.difficulty_level %></span>
+              <% end %>
+              <span class="badge <%= destination.climbing? ? 'bg-warning' : 'bg-success' %> position-absolute" style="bottom: 8px; left: 8px;">
+                <%= destination.activity_type.capitalize %>
+              </span>
+            </div>
+            <div class="card-body">
+              <h6 class="fw-bold mb-1 text-dark"><%= destination.name %></h6>
+              <p class="text-muted small mb-0"><%= destination.address.truncate(40) %></p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- CTA Section -->
+<div class="hero-section text-white text-center mb-4">
+  <div class="hero-content">
+    <h2 class="fw-bold mb-3">
+      <i class="bi bi-rocket-takeoff me-2"></i>Ready for Your Next Adventure?
+    </h2>
+    <p class="mb-4">Join hundreds of climbers and hikers sharing rides to the best outdoor spots.</p>
+    <% if user_signed_in? %>
+      <%= link_to new_trip_path, class: "btn btn-light btn-lg px-5" do %>
+        <i class="bi bi-car-front me-2"></i>Offer a Ride Now
+      <% end %>
+    <% else %>
+      <%= link_to new_user_registration_path, class: "btn btn-light btn-lg px-5" do %>
+        <i class="bi bi-person-plus me-2"></i>Get Started Free
+      <% end %>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,174 @@
+<nav aria-label="breadcrumb" class="mb-4">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><%= link_to "Destinations", destinations_path %><i class="bi bi-chevron-right mx-2"></i></li>
+    <li class="breadcrumb-item active"><%= @destination.name %></li>
+  </ol>
+</nav>
+
+<div class="row">
+  <div class="col-lg-8">
+    <!-- Destination Header -->
+    <div class="card mb-4">
+      <div class="position-relative" style="height: 300px; overflow: hidden; border-radius: 16px 16px 0 0;">
+        <% if @destination.image_url.present? %>
+          <img src="<%= @destination.image_url %>" alt="<%= @destination.name %>" style="width: 100%; height: 100%; object-fit: cover;">
+        <% else %>
+          <div class="<%= @destination.climbing? ? 'climbing-bg' : 'hiking-bg' %> h-100 d-flex align-items-center justify-content-center">
+            <i class="bi <%= @destination.climbing? ? 'bi-signpost-split' : 'bi-tree' %>" style="font-size: 5rem; color: rgba(255,255,255,0.8);"></i>
+          </div>
+        <% end %>
+        <% if @destination.difficulty_level.present? %>
+          <span class="badge bg-dark position-absolute" style="top: 16px; right: 16px; font-size: 0.9rem;">
+            <i class="bi bi-speedometer2 me-1"></i><%= @destination.difficulty_level %>
+          </span>
+        <% end %>
+        <span class="badge <%= @destination.climbing? ? 'bg-warning' : 'bg-success' %> position-absolute" style="bottom: 16px; left: 16px; font-size: 1rem;">
+          <i class="bi <%= @destination.climbing? ? 'bi-signpost-split' : 'bi-tree' %> me-1"></i>
+          <%= @destination.activity_type.capitalize %>
+        </span>
+      </div>
+      <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between mb-3">
+          <div>
+            <h2 class="fw-bold mb-1"><%= @destination.name %></h2>
+            <p class="text-muted mb-0">
+              <i class="bi bi-geo-alt me-1"></i><%= @destination.address %>
+            </p>
+          </div>
+          <span class="badge <%= @destination.climbing? ? 'bg-warning' : 'bg-success' %>" style="font-size: 1rem;">
+            <i class="bi <%= @destination.climbing? ? 'bi-signpost-split' : 'bi-tree' %> me-1"></i>
+            <%= @destination.activity_type.capitalize %>
+          </span>
+        </div>
+
+        <% if @destination.description.present? %>
+          <hr>
+          <h5 class="fw-bold mb-3">
+            <i class="bi bi-info-circle me-2 text-muted"></i>About This Destination
+          </h5>
+          <p class="mb-0"><%= @destination.description %></p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Map -->
+    <% if @destination.latitude.present? && @destination.longitude.present? %>
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center">
+          <i class="bi bi-map me-2 text-primary"></i>
+          <h5 class="mb-0">Location</h5>
+        </div>
+        <div class="card-body p-0 map-container">
+          <div id="map" style="height: 400px; border-radius: 0 0 16px 16px;"></div>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener("DOMContentLoaded", function() {
+          var map = L.map('map').setView([<%= @destination.latitude %>, <%= @destination.longitude %>], 12);
+
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          }).addTo(map);
+
+          var marker = L.marker([<%= @destination.latitude %>, <%= @destination.longitude %>]).addTo(map);
+          marker.bindPopup('<strong><%= j @destination.name %></strong><br><small><%= j @destination.address %></small>').openPopup();
+        });
+      </script>
+    <% end %>
+  </div>
+
+  <div class="col-lg-4">
+    <!-- Upcoming Trips -->
+    <div class="card mb-4">
+      <div class="card-header d-flex align-items-center">
+        <i class="bi bi-calendar-event me-2 text-primary"></i>
+        <h5 class="mb-0">Upcoming Trips</h5>
+      </div>
+      <% if @upcoming_trips.any? %>
+        <ul class="list-group list-group-flush">
+          <% @upcoming_trips.each do |trip| %>
+            <li class="list-group-item">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <strong><%= trip.departure_date.strftime("%b %d, %Y") %></strong>
+                  <br>
+                  <small class="text-muted">
+                    <i class="bi bi-clock me-1"></i><%= trip.departure_date.strftime("%H:%M") %>
+                  </small>
+                  <br>
+                  <small class="text-muted">
+                    <i class="bi bi-person me-1"></i><%= trip.driver.name %>
+                  </small>
+                </div>
+                <div class="text-end">
+                  <span class="badge bg-primary mb-1">
+                    <i class="bi bi-people me-1"></i><%= trip.seats_remaining %> seats
+                  </span>
+                  <br>
+                  <span class="fw-bold text-primary"><%= number_to_currency(trip.price_per_seat, unit: "\u20AC") %></span>
+                  <br>
+                  <%= link_to trip, class: "btn btn-sm btn-outline-primary mt-1" do %>
+                    View <i class="bi bi-arrow-right"></i>
+                  <% end %>
+                </div>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <div class="card-body text-center py-4">
+          <i class="bi bi-calendar-x text-muted" style="font-size: 2.5rem;"></i>
+          <p class="text-muted mt-3 mb-3">No upcoming trips to this destination.</p>
+          <% if user_signed_in? %>
+            <%= link_to new_trip_path, class: "btn btn-primary" do %>
+              <i class="bi bi-plus-circle me-1"></i> Be the First to Offer!
+            <% end %>
+          <% else %>
+            <%= link_to new_user_registration_path, class: "btn btn-primary" do %>
+              <i class="bi bi-person-plus me-1"></i> Sign Up to Offer
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <%= link_to trips_path(destination_id: @destination.id), class: "btn btn-outline-primary w-100 mb-4" do %>
+      <i class="bi bi-search me-1"></i> View All Trips to This Destination
+    <% end %>
+
+    <!-- Quick Info Card -->
+    <div class="card">
+      <div class="card-header d-flex align-items-center">
+        <i class="bi bi-info-circle me-2 text-info"></i>
+        <h6 class="mb-0">Quick Info</h6>
+      </div>
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-3">
+          <i class="bi bi-signpost-2 text-muted me-3" style="font-size: 1.25rem;"></i>
+          <div>
+            <small class="text-muted d-block">Activity Type</small>
+            <strong><%= @destination.activity_type.capitalize %></strong>
+          </div>
+        </div>
+        <% if @destination.difficulty_level.present? %>
+          <div class="d-flex align-items-center mb-3">
+            <i class="bi bi-speedometer2 text-muted me-3" style="font-size: 1.25rem;"></i>
+            <div>
+              <small class="text-muted d-block">Difficulty</small>
+              <strong><%= @destination.difficulty_level %></strong>
+            </div>
+          </div>
+        <% end %>
+        <div class="d-flex align-items-center">
+          <i class="bi bi-geo-alt text-muted me-3" style="font-size: 1.25rem;"></i>
+          <div>
+            <small class="text-muted d-block">Location</small>
+            <strong><%= @destination.address %></strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

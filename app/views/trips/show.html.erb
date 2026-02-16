@@ -1,0 +1,270 @@
+<nav aria-label="breadcrumb" class="mb-4">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><%= link_to "Trips", trips_path %><i class="bi bi-chevron-right mx-2"></i></li>
+    <li class="breadcrumb-item active"><%= @trip.display_name %></li>
+  </ol>
+</nav>
+
+<div class="row">
+  <div class="col-lg-8">
+    <!-- Trip Header Card -->
+    <div class="card mb-4">
+      <div class="position-relative" style="height: 250px; overflow: hidden; border-radius: 16px 16px 0 0;">
+        <% if @trip.display_image_url.present? %>
+          <img src="<%= @trip.display_image_url %>" alt="<%= @trip.display_name %>" style="width: 100%; height: 100%; object-fit: cover;">
+        <% else %>
+          <div class="<%= @trip.climbing? ? 'climbing-bg' : 'hiking-bg' %> h-100 d-flex align-items-center justify-content-center">
+            <i class="bi <%= @trip.climbing? ? 'bi-signpost-split' : 'bi-tree' %>" style="font-size: 5rem; color: rgba(255,255,255,0.8);"></i>
+          </div>
+        <% end %>
+        <span class="badge bg-<%= @trip.open? ? 'success' : 'secondary' %> position-absolute" style="top: 16px; right: 16px; font-size: 0.9rem;">
+          <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i><%= @trip.status.capitalize %>
+        </span>
+        <span class="badge <%= @trip.climbing? ? 'bg-warning' : 'bg-success' %> position-absolute" style="bottom: 16px; left: 16px; font-size: 0.9rem;">
+          <i class="bi <%= @trip.climbing? ? 'bi-signpost-split' : 'bi-tree' %> me-1"></i>
+          <%= @trip.climbing? ? 'Climbing' : 'Hiking' %>
+        </span>
+      </div>
+      <div class="card-body">
+        <h2 class="fw-bold mb-1"><%= @trip.display_name %></h2>
+        <% if @trip.display_address.present? %>
+          <p class="text-muted mb-4">
+            <i class="bi bi-geo-alt me-1"></i><%= @trip.display_address %>
+          </p>
+        <% end %>
+
+        <div class="row g-4 mb-4">
+          <div class="col-md-6">
+            <div class="d-flex align-items-center mb-3">
+              <div class="feature-icon icon-green me-3" style="width: 50px; height: 50px; font-size: 1.25rem;">
+                <i class="bi bi-calendar3"></i>
+              </div>
+              <div>
+                <small class="text-muted d-block">Date</small>
+                <strong><%= @trip.departure_date.strftime("%A, %B %d, %Y") %></strong>
+              </div>
+            </div>
+            <div class="d-flex align-items-center mb-3">
+              <div class="feature-icon icon-blue me-3" style="width: 50px; height: 50px; font-size: 1.25rem;">
+                <i class="bi bi-clock"></i>
+              </div>
+              <div>
+                <small class="text-muted d-block">Departure Time</small>
+                <strong><%= @trip.departure_date.strftime("%H:%M") %></strong>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="d-flex align-items-center mb-3">
+              <div class="feature-icon icon-orange me-3" style="width: 50px; height: 50px; font-size: 1.25rem;">
+                <i class="bi bi-signpost"></i>
+              </div>
+              <div>
+                <small class="text-muted d-block">Pickup Location (in city)</small>
+                <strong><%= @trip.departure_location %></strong>
+              </div>
+            </div>
+            <div class="d-flex align-items-center mb-3">
+              <div class="feature-icon icon-green me-3" style="width: 50px; height: 50px; font-size: 1.25rem;">
+                <i class="bi bi-currency-euro"></i>
+              </div>
+              <div>
+                <small class="text-muted d-block">Price per Seat</small>
+                <strong class="text-primary" style="font-size: 1.25rem;"><%= number_to_currency(@trip.price_per_seat, unit: "\u20AC") %></strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Participation -->
+        <div class="alert <%= @trip.join_activity? ? 'alert-success' : 'alert-info' %> d-flex align-items-center mb-4">
+          <% if @trip.join_activity? %>
+            <i class="bi bi-person-walking me-3" style="font-size: 1.5rem;"></i>
+            <div>
+              <strong>Driver will join the activity!</strong>
+              <p class="mb-0 small">The driver wants to <%= @trip.climbing? ? 'climb' : 'hike' %> with passengers</p>
+            </div>
+          <% else %>
+            <i class="bi bi-car-front me-3" style="font-size: 1.5rem;"></i>
+            <div>
+              <strong>Ride only</strong>
+              <p class="mb-0 small">The driver is offering a ride to the destination only</p>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Seat Availability -->
+        <div class="card bg-light mb-4">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="fw-bold">
+                <i class="bi bi-people me-1"></i> Seat Availability
+              </span>
+              <span class="badge bg-primary"><%= @trip.seats_remaining %>/<%= @trip.available_seats %> available</span>
+            </div>
+            <div class="progress" style="height: 12px;">
+              <% booked_percentage = ((@trip.available_seats - @trip.seats_remaining).to_f / @trip.available_seats * 100).round %>
+              <div class="progress-bar" style="width: <%= booked_percentage %>%"></div>
+            </div>
+          </div>
+        </div>
+
+        <% if @trip.description.present? %>
+          <h5 class="fw-bold mb-3">
+            <i class="bi bi-chat-left-text me-2 text-muted"></i>Trip Details
+          </h5>
+          <p class="mb-4"><%= @trip.description %></p>
+        <% end %>
+
+        <!-- Driver Info -->
+        <h5 class="fw-bold mb-3">
+          <i class="bi bi-person-circle me-2 text-muted"></i>Your Driver
+        </h5>
+        <div class="d-flex align-items-center">
+          <div class="avatar me-3">
+            <%= @trip.driver.name.first.upcase %>
+          </div>
+          <div>
+            <strong><%= @trip.driver.name %></strong>
+            <% if @trip.driver.bio.present? %>
+              <p class="text-muted mb-0 small"><%= truncate(@trip.driver.bio, length: 150) %></p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <% if user_signed_in? && @trip.user == current_user %>
+      <!-- Driver Management -->
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center">
+          <i class="bi bi-gear me-2 text-primary"></i>
+          <h5 class="mb-0">Manage Trip</h5>
+        </div>
+        <div class="card-body">
+          <%= link_to edit_trip_path(@trip), class: "btn btn-outline-primary w-100 mb-2" do %>
+            <i class="bi bi-pencil me-1"></i> Edit Trip
+          <% end %>
+          <%= button_to @trip, method: :delete, class: "btn btn-outline-danger w-100", data: { confirm: "Are you sure you want to cancel this trip?" } do %>
+            <i class="bi bi-x-circle me-1"></i> Cancel Trip
+          <% end %>
+        </div>
+      </div>
+
+      <% if @trip.bookings.confirmed.any? %>
+        <div class="card mb-4">
+          <div class="card-header d-flex align-items-center">
+            <i class="bi bi-people me-2 text-info"></i>
+            <h5 class="mb-0">Passengers (<%= @trip.bookings.confirmed.sum(:seats_booked) %>)</h5>
+          </div>
+          <ul class="list-group list-group-flush">
+            <% @trip.bookings.confirmed.includes(:user).each do |booking| %>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                  <div class="avatar me-2" style="width: 35px; height: 35px; font-size: 0.9rem;">
+                    <%= booking.user.name.first.upcase %>
+                  </div>
+                  <span><%= booking.user.name %></span>
+                </div>
+                <span class="badge bg-primary"><%= booking.seats_booked %> seat(s)</span>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+    <% elsif user_signed_in? && @trip.open? && @trip.seats_remaining > 0 %>
+      <!-- Booking Card -->
+      <div class="card sticky-top" style="top: 100px;">
+        <div class="card-header d-flex align-items-center bg-primary text-white">
+          <i class="bi bi-ticket-perforated me-2"></i>
+          <h5 class="mb-0">Book This Trip</h5>
+        </div>
+        <div class="card-body">
+          <%= form_with model: [@trip, @booking], local: true do |f| %>
+            <div class="mb-3">
+              <%= f.label :seats_booked, class: "form-label fw-bold" do %>
+                <i class="bi bi-people me-1"></i> Number of Seats
+              <% end %>
+              <%= f.number_field :seats_booked, min: 1, max: @trip.seats_remaining, value: 1, class: "form-control form-control-lg", id: "seats-input" %>
+              <div class="form-text">
+                <i class="bi bi-info-circle me-1"></i><%= @trip.seats_remaining %> seat(s) available
+              </div>
+            </div>
+
+            <div class="bg-light rounded p-3 mb-4">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="text-muted">Price per seat</span>
+                <span><%= number_to_currency(@trip.price_per_seat, unit: "\u20AC") %></span>
+              </div>
+              <hr class="my-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-bold">Total</span>
+                <span class="fw-bold text-primary" style="font-size: 1.5rem;" id="total-price"><%= number_to_currency(@trip.price_per_seat, unit: "\u20AC") %></span>
+              </div>
+            </div>
+
+            <%= f.submit class: "btn btn-primary btn-lg w-100" do %>
+              <i class="bi bi-check-circle me-1"></i> Book Now
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const seatsInput = document.getElementById('seats-input');
+          const totalPrice = document.getElementById('total-price');
+          const pricePerSeat = <%= @trip.price_per_seat %>;
+
+          if (seatsInput && totalPrice) {
+            seatsInput.addEventListener('input', function() {
+              const seats = parseInt(this.value) || 1;
+              const total = seats * pricePerSeat;
+              totalPrice.textContent = '\u20AC' + total.toFixed(2);
+            });
+          }
+        });
+      </script>
+
+    <% elsif !user_signed_in? %>
+      <div class="card sticky-top" style="top: 100px;">
+        <div class="card-header d-flex align-items-center">
+          <i class="bi bi-person-plus me-2 text-primary"></i>
+          <h5 class="mb-0">Want to Join?</h5>
+        </div>
+        <div class="card-body text-center">
+          <p class="text-muted">Sign in or create an account to book this trip.</p>
+          <%= link_to new_user_session_path, class: "btn btn-primary w-100 mb-2" do %>
+            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+          <% end %>
+          <%= link_to new_user_registration_path, class: "btn btn-outline-primary w-100" do %>
+            <i class="bi bi-person-plus me-1"></i> Sign Up
+          <% end %>
+        </div>
+      </div>
+
+    <% else %>
+      <div class="card">
+        <div class="card-header d-flex align-items-center">
+          <i class="bi bi-info-circle me-2"></i>
+          <h5 class="mb-0">Trip Status</h5>
+        </div>
+        <div class="card-body text-center py-4">
+          <% if @trip.full? %>
+            <i class="bi bi-people-fill text-warning" style="font-size: 3rem;"></i>
+            <p class="mt-3 mb-0 fw-bold text-warning">This trip is fully booked</p>
+          <% elsif @trip.cancelled? %>
+            <i class="bi bi-x-circle text-danger" style="font-size: 3rem;"></i>
+            <p class="mt-3 mb-0 fw-bold text-danger">This trip has been cancelled</p>
+          <% elsif @trip.completed? %>
+            <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+            <p class="mt-3 mb-0 fw-bold text-muted">This trip has been completed</p>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

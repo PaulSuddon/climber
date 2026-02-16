@@ -1,0 +1,234 @@
+<div class="row">
+  <div class="col-lg-8">
+    <%= form_with model: trip, local: true do |f| %>
+      <% if trip.errors.any? %>
+        <div class="alert alert-danger d-flex align-items-start">
+          <i class="bi bi-exclamation-triangle-fill me-2 mt-1"></i>
+          <div>
+            <strong><%= pluralize(trip.errors.count, "error") %> prevented this trip from being saved:</strong>
+            <ul class="mb-0 mt-2">
+              <% trip.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Destination -->
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center">
+          <i class="bi bi-geo-alt-fill me-2 text-primary"></i>
+          <h5 class="mb-0">Where are you going?</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <%= f.label :destination_name, class: "form-label" do %>
+              <i class="bi bi-pin-map me-1"></i> Destination Name
+            <% end %>
+            <%= f.text_field :destination_name, class: "form-control form-control-lg", placeholder: "e.g., La Pedriza, Siete Picos, Patones..." %>
+            <div class="form-text">Enter the name of the climbing or hiking spot</div>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :destination_address, class: "form-label" do %>
+              <i class="bi bi-signpost-2 me-1"></i> Location / Area (optional)
+            <% end %>
+            <%= f.text_field :destination_address, class: "form-control", placeholder: "e.g., Sierra de Guadarrama, near Manzanares el Real" %>
+            <div class="form-text">Help passengers know where they're going</div>
+          </div>
+
+          <div class="mb-0">
+            <%= f.label :activity_type, class: "form-label" do %>
+              <i class="bi bi-signpost-split me-1"></i> Activity Type
+            <% end %>
+            <div class="row g-3">
+              <div class="col-6">
+                <div class="form-check card p-3 h-100" style="cursor: pointer;">
+                  <%= f.radio_button :activity_type, "climbing", class: "form-check-input", id: "activity_climbing" %>
+                  <%= f.label :activity_type, class: "form-check-label d-flex align-items-center", for: "activity_climbing", style: "cursor: pointer;" do %>
+                    <i class="bi bi-signpost-split text-warning me-2" style="font-size: 1.5rem;"></i>
+                    <strong>Climbing</strong>
+                  <% end %>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-check card p-3 h-100" style="cursor: pointer;">
+                  <%= f.radio_button :activity_type, "hiking", class: "form-check-input", id: "activity_hiking" %>
+                  <%= f.label :activity_type, class: "form-check-label d-flex align-items-center", for: "activity_hiking", style: "cursor: pointer;" do %>
+                    <i class="bi bi-tree text-success me-2" style="font-size: 1.5rem;"></i>
+                    <strong>Hiking</strong>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trip Details -->
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center">
+          <i class="bi bi-calendar-event me-2 text-success"></i>
+          <h5 class="mb-0">Trip Details</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <%= f.label :departure_date, class: "form-label" do %>
+                <i class="bi bi-clock me-1"></i> Departure Date & Time
+              <% end %>
+              <%= f.datetime_local_field :departure_date, class: "form-control", min: Time.current.strftime("%Y-%m-%dT%H:%M") %>
+              <div class="form-text">When will you be leaving?</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <%= f.label :departure_location, class: "form-label" do %>
+                <i class="bi bi-signpost me-1"></i> Pickup Location (in city)
+              <% end %>
+              <%= f.text_field :departure_location, class: "form-control", placeholder: "e.g., Metro Plaza de Castilla, Exit 2" %>
+              <div class="form-text">Where in the city will you pick up passengers?</div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :description, class: "form-label" do %>
+              <i class="bi bi-chat-left-text me-1"></i> Additional Information (optional)
+            <% end %>
+            <%= f.text_area :description, rows: 3, class: "form-control", placeholder: "What should passengers know? Meeting details, what to bring, skill level required..." %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Participation -->
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center">
+          <i class="bi bi-people me-2 text-info"></i>
+          <h5 class="mb-0">Will you join the activity?</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="form-check card p-3 h-100" style="cursor: pointer;">
+                <%= f.radio_button :join_activity, true, class: "form-check-input", id: "join_activity_true" %>
+                <%= f.label :join_activity, class: "form-check-label d-block", for: "join_activity_true", style: "cursor: pointer;" do %>
+                  <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-person-walking text-primary me-2" style="font-size: 1.5rem;"></i>
+                    <strong>Yes, I'll join!</strong>
+                  </div>
+                  <small class="text-muted">I want to climb/hike with my passengers</small>
+                <% end %>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-check card p-3 h-100" style="cursor: pointer;">
+                <%= f.radio_button :join_activity, false, class: "form-check-input", id: "join_activity_false" %>
+                <%= f.label :join_activity, class: "form-check-label d-block", for: "join_activity_false", style: "cursor: pointer;" do %>
+                  <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-car-front text-secondary me-2" style="font-size: 1.5rem;"></i>
+                    <strong>Ride only</strong>
+                  </div>
+                  <small class="text-muted">I'm just offering a ride to the destination</small>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing & Seats -->
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center">
+          <i class="bi bi-currency-euro me-2 text-warning"></i>
+          <h5 class="mb-0">Pricing & Capacity</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <%= f.label :available_seats, class: "form-label" do %>
+                <i class="bi bi-people me-1"></i> Available Seats
+              <% end %>
+              <div class="input-group">
+                <%= f.number_field :available_seats, min: 1, max: 8, class: "form-control", value: trip.available_seats || 3 %>
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+              </div>
+              <div class="form-text">How many passengers can you take?</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <%= f.label :price_per_seat, class: "form-label" do %>
+                <i class="bi bi-cash me-1"></i> Price per Seat
+              <% end %>
+              <div class="input-group">
+                <span class="input-group-text">&euro;</span>
+                <%= f.number_field :price_per_seat, min: 0, step: 0.5, class: "form-control", placeholder: "10", value: trip.price_per_seat || 10 %>
+              </div>
+              <div class="form-text">Suggested: &euro;5-15 for fuel cost sharing</div>
+            </div>
+          </div>
+
+          <div class="alert alert-info d-flex align-items-center mb-0">
+            <i class="bi bi-info-circle me-2"></i>
+            <div>
+              <strong>Tip:</strong> Set a fair price that covers your fuel costs. This isn't for profit - just to share expenses!
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <% if trip.persisted? %>
+        <div class="card mb-4">
+          <div class="card-header d-flex align-items-center">
+            <i class="bi bi-toggle-on me-2 text-info"></i>
+            <h5 class="mb-0">Trip Status</h5>
+          </div>
+          <div class="card-body">
+            <%= f.label :status, class: "form-label" do %>
+              <i class="bi bi-flag me-1"></i> Status
+            <% end %>
+            <%= f.select :status, Trip.statuses.keys.map { |s| [s.capitalize, s] }, {}, { class: "form-select" } %>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Submit -->
+      <div class="d-flex gap-3">
+        <%= f.submit trip.persisted? ? "Update Trip" : "Create Trip", class: "btn btn-primary btn-lg px-5" %>
+        <%= link_to trips_path, class: "btn btn-outline-secondary btn-lg" do %>
+          <i class="bi bi-x-lg me-1"></i> Cancel
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card sticky-top" style="top: 100px;">
+      <div class="card-header d-flex align-items-center">
+        <i class="bi bi-lightbulb me-2 text-warning"></i>
+        <h6 class="mb-0">Tips for a Great Trip</h6>
+      </div>
+      <div class="card-body">
+        <ul class="list-unstyled mb-0">
+          <li class="mb-3 d-flex">
+            <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+            <span>Be specific about the destination name</span>
+          </li>
+          <li class="mb-3 d-flex">
+            <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+            <span>Choose a clear meeting point that's easy to find</span>
+          </li>
+          <li class="mb-3 d-flex">
+            <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+            <span>Set departure time with buffer for traffic</span>
+          </li>
+          <li class="mb-3 d-flex">
+            <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+            <span>Add details about skill level or gear needed</span>
+          </li>
+          <li class="d-flex">
+            <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+            <span>Keep pricing fair - cover costs, not profit</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

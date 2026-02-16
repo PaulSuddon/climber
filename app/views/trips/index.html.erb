@@ -1,0 +1,134 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="fw-bold mb-1">
+      <i class="bi bi-car-front-fill text-primary me-2"></i>Available Trips
+    </h1>
+    <p class="text-muted mb-0">Find your next adventure</p>
+  </div>
+  <% if user_signed_in? %>
+    <%= link_to new_trip_path, class: "btn btn-primary btn-lg" do %>
+      <i class="bi bi-plus-circle me-2"></i>Offer a Ride
+    <% end %>
+  <% end %>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+  <div class="card-body">
+    <%= form_tag trips_path, method: :get, class: "row g-3 align-items-end" do %>
+      <div class="col-md-3">
+        <%= label_tag :activity_type, class: "form-label" do %>
+          <i class="bi bi-funnel me-1"></i> Activity Type
+        <% end %>
+        <%= select_tag :activity_type, options_for_select([["All Activities", ""], ["Climbing", "climbing"], ["Hiking", "hiking"]], params[:activity_type]), class: "form-select" %>
+      </div>
+      <div class="col-md-3">
+        <%= label_tag :destination, class: "form-label" do %>
+          <i class="bi bi-geo-alt me-1"></i> Destination
+        <% end %>
+        <%= text_field_tag :destination, params[:destination], class: "form-control", placeholder: "Search by name..." %>
+      </div>
+      <div class="col-md-2">
+        <%= label_tag :date, class: "form-label" do %>
+          <i class="bi bi-calendar3 me-1"></i> Date
+        <% end %>
+        <%= date_field_tag :date, params[:date], class: "form-control" %>
+      </div>
+      <div class="col-md-2">
+        <%= label_tag :join_activity, class: "form-label" do %>
+          <i class="bi bi-person-walking me-1"></i> Driver
+        <% end %>
+        <%= select_tag :join_activity, options_for_select([["Any", ""], ["Joins activity", "true"], ["Ride only", "false"]], params[:join_activity]), class: "form-select" %>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">&nbsp;</label>
+        <div class="d-flex gap-2">
+          <%= submit_tag "Search", class: "btn btn-primary flex-grow-1" %>
+          <%= link_to trips_path, class: "btn btn-outline-secondary" do %>
+            <i class="bi bi-x-lg"></i>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<% if @trips.any? %>
+  <div class="row g-4">
+    <% @trips.each do |trip| %>
+      <div class="col-md-6 col-lg-4">
+        <div class="card trip-card h-100">
+          <div class="position-relative" style="height: 180px; overflow: hidden;">
+            <% if trip.display_image_url.present? %>
+              <img src="<%= trip.display_image_url %>" alt="<%= trip.display_name %>" style="width: 100%; height: 100%; object-fit: cover;">
+            <% else %>
+              <div class="<%= trip.climbing? ? 'climbing-bg' : 'hiking-bg' %> h-100 d-flex align-items-center justify-content-center">
+                <i class="bi <%= trip.climbing? ? 'bi-signpost-split' : 'bi-tree' %>" style="font-size: 4rem; color: rgba(255,255,255,0.8);"></i>
+              </div>
+            <% end %>
+            <span class="badge bg-light text-dark position-absolute" style="top: 12px; right: 12px;">
+              <i class="bi bi-people-fill me-1"></i><%= trip.seats_remaining %> seats
+            </span>
+            <span class="badge <%= trip.climbing? ? 'bg-warning' : 'bg-success' %> position-absolute" style="bottom: 12px; left: 12px;">
+              <i class="bi <%= trip.climbing? ? 'bi-signpost-split' : 'bi-tree' %> me-1"></i>
+              <%= trip.climbing? ? 'Climbing' : 'Hiking' %>
+            </span>
+          </div>
+          <div class="trip-details">
+            <h5 class="trip-title"><%= trip.display_name %></h5>
+            <div class="mb-2">
+              <% if trip.join_activity? %>
+                <span class="badge bg-success"><i class="bi bi-person-walking me-1"></i>Driver joins</span>
+              <% else %>
+                <span class="badge bg-secondary"><i class="bi bi-car-front me-1"></i>Ride only</span>
+              <% end %>
+            </div>
+            <div class="trip-info">
+              <i class="bi bi-calendar3"></i>
+              <span><%= trip.departure_date.strftime("%A, %B %d") %></span>
+            </div>
+            <div class="trip-info">
+              <i class="bi bi-clock"></i>
+              <span><%= trip.departure_date.strftime("%H:%M") %></span>
+            </div>
+            <div class="trip-info">
+              <i class="bi bi-geo-alt"></i>
+              <span><%= trip.departure_location %></span>
+            </div>
+            <div class="trip-info">
+              <i class="bi bi-person"></i>
+              <span><%= trip.driver.name %></span>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="trip-price">
+                <%= number_to_currency(trip.price_per_seat, unit: "\u20AC", precision: 0) %>
+                <small>/seat</small>
+              </div>
+              <%= link_to trip, class: "btn btn-primary" do %>
+                View <i class="bi bi-arrow-right ms-1"></i>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="card">
+    <div class="card-body text-center py-5">
+      <i class="bi bi-search text-muted" style="font-size: 4rem;"></i>
+      <h4 class="mt-3">No Trips Found</h4>
+      <p class="text-muted mb-4">There are no trips matching your criteria. Try adjusting your filters or offer your own ride!</p>
+      <% if user_signed_in? %>
+        <%= link_to new_trip_path, class: "btn btn-primary btn-lg" do %>
+          <i class="bi bi-plus-circle me-2"></i>Offer a Ride
+        <% end %>
+      <% else %>
+        <%= link_to new_user_registration_path, class: "btn btn-primary btn-lg" do %>
+          <i class="bi bi-person-plus me-2"></i>Sign Up to Offer
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

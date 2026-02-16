@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  trip: one
+  user: one
+  seats_booked: 1
+  status: 1
+
+two:
+  trip: two
+  user: two
+  seats_booked: 1
+  status: 1
