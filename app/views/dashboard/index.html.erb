@@ -5,38 +5,105 @@
   <p class="text-muted">Welcome back, <%= current_user.name %>!</p>
 </div>
 
+<% if @pending_requests.any? %>
+<!-- Pending Booking Requests -->
+<div class="card mb-4 border-warning">
+  <div class="card-header bg-warning bg-opacity-10 d-flex align-items-center">
+    <i class="bi bi-exclamation-circle text-warning me-2"></i>
+    <h5 class="mb-0">Pending Booking Requests (<%= @pending_requests.count %>)</h5>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <tbody>
+        <% @pending_requests.each do |booking| %>
+          <tr>
+            <td style="width: 50px;">
+              <% if booking.user.avatar.attached? %>
+                <%= image_tag booking.user.avatar, class: "rounded-circle", style: "width: 40px; height: 40px; object-fit: cover;" %>
+              <% else %>
+                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                  <i class="bi bi-person-fill text-white"></i>
+                </div>
+              <% end %>
+            </td>
+            <td><strong><%= link_to booking.user.name, profile_path(booking.user), class: "text-decoration-none" %></strong></td>
+            <td><i class="bi bi-geo-alt text-muted me-1"></i><%= booking.trip.display_name %></td>
+            <td><i class="bi bi-calendar3 text-muted me-1"></i><%= booking.trip.departure_date.strftime("%b %d") %></td>
+            <td><span class="badge bg-primary"><%= booking.seats_booked %> seat(s)</span></td>
+            <td class="text-end" style="white-space: nowrap;">
+              <%= button_to confirm_trip_booking_path(booking.trip, booking), method: :post, class: "btn btn-success btn-sm me-1" do %>
+                <i class="bi bi-check"></i> Confirm
+              <% end %>
+              <%= button_to reject_trip_booking_path(booking.trip, booking), method: :post, class: "btn btn-outline-danger btn-sm", style: "display: inline-block;" do %>
+                <i class="bi bi-x"></i> Reject
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<% end %>
+
 <!-- Quick Actions -->
-<div class="row g-4 mb-5">
-  <div class="col-6 col-md-3">
-    <%= link_to new_trip_path, class: "quick-action" do %>
-      <div class="action-icon bg-primary bg-opacity-10">
+<div class="row row-cols-6 g-3 mb-5">
+  <div class="col">
+    <%= link_to new_trip_path, class: "quick-action h-100" do %>
+      <div class="action-icon bg-primary bg-opacity-10 mx-auto">
         <i class="bi bi-plus-circle text-primary"></i>
       </div>
       <span class="action-label">Offer a Ride</span>
     <% end %>
   </div>
-  <div class="col-6 col-md-3">
-    <%= link_to trips_path, class: "quick-action" do %>
-      <div class="action-icon bg-success bg-opacity-10">
+  <div class="col">
+    <%= link_to trips_path, class: "quick-action h-100" do %>
+      <div class="action-icon bg-success bg-opacity-10 mx-auto">
         <i class="bi bi-search text-success"></i>
       </div>
       <span class="action-label">Find a Trip</span>
     <% end %>
   </div>
-  <div class="col-6 col-md-3">
-    <%= link_to destinations_path, class: "quick-action" do %>
-      <div class="action-icon bg-warning bg-opacity-10">
+  <div class="col">
+    <%= link_to destinations_path, class: "quick-action h-100" do %>
+      <div class="action-icon bg-warning bg-opacity-10 mx-auto">
         <i class="bi bi-geo-alt text-warning"></i>
       </div>
       <span class="action-label">Destinations</span>
     <% end %>
   </div>
-  <div class="col-6 col-md-3">
-    <%= link_to edit_user_registration_path, class: "quick-action" do %>
-      <div class="action-icon bg-secondary bg-opacity-10">
-        <i class="bi bi-gear text-secondary"></i>
+  <div class="col">
+    <%= link_to conversations_path, class: "quick-action h-100" do %>
+      <div class="action-icon bg-info bg-opacity-10 position-relative mx-auto">
+        <i class="bi bi-chat-dots text-info"></i>
+        <% if current_user.unread_messages_count > 0 %>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            <%= current_user.unread_messages_count %>
+          </span>
+        <% end %>
       </div>
-      <span class="action-label">Settings</span>
+      <span class="action-label">Messages</span>
+    <% end %>
+  </div>
+  <div class="col">
+    <%= link_to notifications_path, class: "quick-action h-100" do %>
+      <div class="action-icon bg-danger bg-opacity-10 position-relative mx-auto">
+        <i class="bi bi-bell text-danger"></i>
+        <% if current_user.unread_notifications_count > 0 %>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            <%= current_user.unread_notifications_count %>
+          </span>
+        <% end %>
+      </div>
+      <span class="action-label">Notifications</span>
+    <% end %>
+  </div>
+  <div class="col">
+    <%= link_to profile_path(current_user), class: "quick-action h-100" do %>
+      <div class="action-icon bg-secondary bg-opacity-10 mx-auto">
+        <i class="bi bi-person text-secondary"></i>
+      </div>
+      <span class="action-label">My Profile</span>
     <% end %>
   </div>
 </div>
@@ -137,7 +204,7 @@
                       <i class="bi bi-person ms-2 me-1"></i><%= booking.trip.driver.name %>
                     </small>
                     <br>
-                    <span class="badge bg-<%= booking.confirmed? ? 'success' : 'secondary' %> me-1">
+                    <span class="badge bg-<%= booking.confirmed? ? 'success' : (booking.pending? ? 'warning' : 'secondary') %> me-1">
                       <%= booking.status.capitalize %>
                     </span>
                     <span class="badge bg-primary">
@@ -148,6 +215,9 @@
                 <div class="d-flex gap-1">
                   <%= link_to booking.trip, class: "btn btn-sm btn-outline-info" do %>
                     <i class="bi bi-eye"></i>
+                  <% end %>
+                  <%= button_to conversations_path(recipient_id: booking.trip.driver.id), method: :post, class: "btn btn-sm btn-outline-primary" do %>
+                    <i class="bi bi-chat-dots"></i>
                   <% end %>
                   <% if booking.confirmed? && booking.trip.departure_date > Time.current %>
                     <%= button_to trip_booking_path(booking.trip, booking), method: :delete, class: "btn btn-sm btn-outline-danger", data: { confirm: "Are you sure?" } do %>

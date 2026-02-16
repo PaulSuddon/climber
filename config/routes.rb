@@ -5,8 +5,28 @@ Rails.application.routes.draw do
 
   resources :destinations, only: [:index, :show]
   resources :trips do
-    resources :bookings, only: [:create, :destroy]
+    resources :bookings, only: [:create, :destroy] do
+      member do
+        post :confirm
+        post :reject
+      end
+    end
   end
+
+  resources :conversations, only: [:index, :show, :create] do
+    resources :messages, only: [:create]
+  end
+
+  resources :notifications, only: [:index] do
+    member do
+      post :mark_as_read
+    end
+    collection do
+      post :mark_all_as_read
+    end
+  end
+
+  resources :profiles, only: [:show, :edit, :update]
 
   get "dashboard", to: "dashboard#index"
 

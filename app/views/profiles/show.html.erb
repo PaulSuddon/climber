@@ -1,0 +1,129 @@
+<div class="row">
+  <div class="col-lg-10 mx-auto">
+    <!-- Profile Header -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <% if @user.avatar.attached? %>
+              <%= image_tag @user.avatar, class: "rounded-circle", style: "width: 120px; height: 120px; object-fit: cover;" %>
+            <% else %>
+              <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                <i class="bi bi-person-fill text-white" style="font-size: 3rem;"></i>
+              </div>
+            <% end %>
+          </div>
+          <div class="col">
+            <h2 class="mb-1"><%= @user.name %></h2>
+            <p class="text-muted mb-2">
+              <i class="bi bi-calendar3 me-1"></i> Member since <%= @user.created_at.strftime("%B %Y") %>
+            </p>
+            <% if @user.bio.present? %>
+              <p class="mb-0"><%= @user.bio %></p>
+            <% end %>
+          </div>
+          <div class="col-auto">
+            <% if current_user == @user %>
+              <%= link_to edit_profile_path(@user), class: "btn btn-outline-primary" do %>
+                <i class="bi bi-pencil me-1"></i> Edit Profile
+              <% end %>
+            <% elsif user_signed_in? %>
+              <%= button_to conversations_path(recipient_id: @user.id), method: :post, class: "btn btn-primary" do %>
+                <i class="bi bi-chat me-1"></i> Send Message
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+      <div class="col-md-4 mb-3">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <i class="bi bi-trophy fs-1 text-warning"></i>
+            <h3 class="mt-2 mb-0"><%= @user.total_adventures_count %></h3>
+            <p class="text-muted mb-0">Total Adventures</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <i class="bi bi-car-front fs-1 text-primary"></i>
+            <h3 class="mt-2 mb-0"><%= @user.trips_as_driver_count %></h3>
+            <p class="text-muted mb-0">Trips as Driver</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <i class="bi bi-person-walking fs-1 text-success"></i>
+            <h3 class="mt-2 mb-0"><%= @user.completed_trips_count %></h3>
+            <p class="text-muted mb-0">Trips as Passenger</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Trips as Driver -->
+    <% if @trips_as_driver.any? %>
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-car-front me-2"></i>Recent Trips Offered</h5>
+        </div>
+        <div class="list-group list-group-flush">
+          <% @trips_as_driver.each do |trip| %>
+            <%= link_to trip_path(trip), class: "list-group-item list-group-item-action" do %>
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-1"><%= trip.display_name %></h6>
+                  <small class="text-muted">
+                    <i class="bi bi-calendar me-1"></i><%= trip.departure_date.strftime("%B %d, %Y") %>
+                    <span class="badge bg-<%= trip.climbing? ? 'danger' : 'success' %> ms-2">
+                      <%= trip.activity_type.capitalize %>
+                    </span>
+                  </small>
+                </div>
+                <span class="badge bg-<%= trip.status == 'completed' ? 'secondary' : 'primary' %>">
+                  <%= trip.status.capitalize %>
+                </span>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Recent Trips as Passenger -->
+    <% if @recent_bookings.any? %>
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-person-walking me-2"></i>Recent Trips Joined</h5>
+        </div>
+        <div class="list-group list-group-flush">
+          <% @recent_bookings.each do |booking| %>
+            <%= link_to trip_path(booking.trip), class: "list-group-item list-group-item-action" do %>
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-1"><%= booking.trip.display_name %></h6>
+                  <small class="text-muted">
+                    <i class="bi bi-calendar me-1"></i><%= booking.trip.departure_date.strftime("%B %d, %Y") %>
+                    <span class="badge bg-<%= booking.trip.climbing? ? 'danger' : 'success' %> ms-2">
+                      <%= booking.trip.activity_type.capitalize %>
+                    </span>
+                  </small>
+                </div>
+                <span class="badge bg-<%= booking.trip.status == 'completed' ? 'secondary' : 'primary' %>">
+                  <%= booking.trip.status.capitalize %>
+                </span>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

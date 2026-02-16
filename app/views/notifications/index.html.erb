@@ -1,0 +1,63 @@
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2><i class="bi bi-bell me-2"></i>Notifications</h2>
+      <% if current_user.notifications.unread.any? %>
+        <%= button_to mark_all_as_read_notifications_path, method: :post, class: "btn btn-outline-secondary btn-sm" do %>
+          <i class="bi bi-check-all me-1"></i> Mark all as read
+        <% end %>
+      <% end %>
+    </div>
+
+    <% if @notifications.any? %>
+      <div class="list-group">
+        <% @notifications.each do |notification| %>
+          <div class="list-group-item list-group-item-action <%= notification.read? ? '' : 'bg-light' %>">
+            <div class="d-flex w-100 justify-content-between align-items-start">
+              <div class="d-flex align-items-start">
+                <div class="me-3">
+                  <% case notification.notification_type %>
+                  <% when "booking_created" %>
+                    <i class="bi bi-person-plus-fill text-primary fs-4"></i>
+                  <% when "booking_confirmed" %>
+                    <i class="bi bi-check-circle-fill text-success fs-4"></i>
+                  <% when "booking_rejected" %>
+                    <i class="bi bi-x-circle-fill text-danger fs-4"></i>
+                  <% when "trip_cancelled" %>
+                    <i class="bi bi-exclamation-triangle-fill text-warning fs-4"></i>
+                  <% end %>
+                </div>
+                <div>
+                  <p class="mb-1 <%= notification.read? ? 'text-muted' : 'fw-semibold' %>">
+                    <%= notification.message %>
+                  </p>
+                  <small class="text-muted">
+                    <%= time_ago_in_words(notification.created_at) %> ago
+                  </small>
+
+                  <% if notification.notification_type == "booking_created" && notification.notifiable.pending? %>
+                    <div class="mt-2">
+                      <%= button_to "Confirm", confirm_trip_booking_path(notification.notifiable.trip, notification.notifiable), method: :post, class: "btn btn-success btn-sm me-2" %>
+                      <%= button_to "Reject", reject_trip_booking_path(notification.notifiable.trip, notification.notifiable), method: :post, class: "btn btn-danger btn-sm" %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+
+              <% unless notification.read? %>
+                <%= button_to mark_as_read_notification_path(notification), method: :post, class: "btn btn-link btn-sm p-0" do %>
+                  <i class="bi bi-check2"></i>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-center py-5">
+        <i class="bi bi-bell-slash fs-1 text-muted"></i>
+        <p class="text-muted mt-3">No notifications yet.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

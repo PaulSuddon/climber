@@ -440,7 +440,7 @@ footer {
 // Quick action cards
 .quick-action {
   display: block;
-  padding: 2rem;
+  padding: 1rem 0.5rem;
   text-align: center;
   border-radius: 16px;
   background: white;
@@ -455,13 +455,13 @@ footer {
   }
 
   .action-icon {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 1rem;
+    margin: 0 auto 0.5rem;
     font-size: 1.5rem;
   }
 
