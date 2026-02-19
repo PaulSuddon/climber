@@ -79,6 +79,4 @@ test:
 #
 production:
   <<: *default
-  database: climber_production
-  username: climber
-  password: <%= ENV["CLIMBER_DATABASE_PASSWORD"] %>
+  url: <%= ENV["DATABASE_URL"] %>

@@ -71,3 +71,6 @@ end
 
 # Authentication
 gem "devise"
+
+# AWS S3 SDK for Supabase Storage (S3-compatible)
+gem "aws-sdk-s3", require: false

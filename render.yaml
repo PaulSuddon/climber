@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: climber
+    runtime: ruby
+    buildCommand: "./bin/render-build.sh"
+    startCommand: "bundle exec puma -C config/puma.rb"
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: SUPABASE_PROJECT_ID
+        sync: false
+      - key: SUPABASE_ACCESS_KEY_ID
+        sync: false
+      - key: SUPABASE_SECRET_ACCESS_KEY
+        sync: false
