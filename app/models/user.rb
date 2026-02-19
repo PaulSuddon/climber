@@ -15,6 +15,9 @@ class User < ApplicationRecord
   has_many :received_conversations, class_name: "Conversation", foreign_key: :recipient_id, dependent: :destroy
   has_many :messages, dependent: :destroy
 
+  has_many :ratings_given, class_name: "Rating", foreign_key: :reviewer_id, dependent: :destroy
+  has_many :ratings_received, class_name: "Rating", foreign_key: :rated_user_id, dependent: :destroy
+
   validates :name, presence: true
 
   def conversations
@@ -52,5 +55,13 @@ class User < ApplicationRecord
     else
       nil
     end
+  end
+
+  def average_rating
+    ratings_received.average(:rating)&.round(1)
+  end
+
+  def ratings_count
+    ratings_received.count
   end
 end

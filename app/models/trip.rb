@@ -4,6 +4,7 @@ class Trip < ApplicationRecord
 
   has_many :bookings, dependent: :destroy
   has_many :passengers, through: :bookings, source: :user
+  has_many :ratings, dependent: :destroy
 
   enum :status, { open: 0, full: 1, completed: 2, cancelled: 3 }, default: :open
 

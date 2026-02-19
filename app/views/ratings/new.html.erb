@@ -1,0 +1,145 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header d-flex align-items-center">
+          <i class="bi bi-star-fill me-2 text-warning"></i>
+          <h5 class="mb-0">Rate your experience</h5>
+        </div>
+        <div class="card-body">
+          <div class="text-center mb-4">
+            <% if @rated_user.avatar.attached? %>
+              <%= image_tag @rated_user.avatar, class: "rounded-circle mb-2", style: "width: 80px; height: 80px; object-fit: cover;" %>
+            <% else %>
+              <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center mb-2" style="width: 80px; height: 80px;">
+                <i class="bi bi-person-fill text-white" style="font-size: 2rem;"></i>
+              </div>
+            <% end %>
+            <h5 class="mb-1"><%= @rated_user.name %></h5>
+            <p class="text-muted mb-0">
+              Trip to <%= @trip.display_name %>
+            </p>
+          </div>
+
+          <%= form_with model: [@trip, @rating], url: trip_ratings_path(@trip, user_id: @rated_user.id), local: true do |f| %>
+            <% if @rating.errors.any? %>
+              <div class="alert alert-danger">
+                <ul class="mb-0">
+                  <% @rating.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+            <div class="mb-4 text-center">
+              <label class="form-label d-block mb-3">How was your experience?</label>
+              <div class="star-rating d-inline-flex gap-2" style="font-size: 2.5rem;">
+                <% (1..5).each do |star| %>
+                  <div class="form-check form-check-inline m-0 p-0">
+                    <%= f.radio_button :rating, star, class: "btn-check", id: "star#{star}" %>
+                    <label class="btn p-0 star-label" for="star#{star}" style="cursor: pointer;">
+                      <i class="bi bi-star star-icon text-muted"></i>
+                    </label>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <%= f.label :comment, class: "form-label" do %>
+                <i class="bi bi-chat-left-text me-1"></i> Comment (optional)
+              <% end %>
+              <%= f.text_area :comment, rows: 3, class: "form-control", placeholder: "Share your experience..." %>
+            </div>
+
+            <div class="d-grid gap-2">
+              <%= f.submit "Submit Rating", class: "btn btn-primary btn-lg" %>
+              <%= link_to "Skip", @trip, class: "btn btn-outline-secondary" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .star-rating input:checked ~ label .star-icon,
+  .star-rating label:hover .star-icon,
+  .star-rating label:hover ~ label .star-icon {
+    color: #ffc107 !important;
+  }
+
+  .star-rating input:checked + label .star-icon {
+    color: #ffc107 !important;
+  }
+
+  .star-rating {
+    direction: rtl;
+  }
+
+  .star-rating label {
+    direction: ltr;
+  }
+
+  .star-rating input:checked + label .star-icon,
+  .star-rating input:checked + label ~ label .star-icon {
+    color: #ffc107 !important;
+  }
+
+  .star-rating label:hover .star-icon,
+  .star-rating label:hover ~ label .star-icon {
+    color: #ffc107 !important;
+  }
+
+  .star-label .star-icon {
+    transition: color 0.15s ease-in-out;
+  }
+
+  .star-label:hover .star-icon {
+    color: #ffc107 !important;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.star-rating input[type="radio"]');
+    const labels = document.querySelectorAll('.star-rating .star-icon');
+
+    function updateStars(selectedValue) {
+      labels.forEach((icon, index) => {
+        if (index < selectedValue) {
+          icon.classList.remove('bi-star', 'text-muted');
+          icon.classList.add('bi-star-fill', 'text-warning');
+        } else {
+          icon.classList.remove('bi-star-fill', 'text-warning');
+          icon.classList.add('bi-star', 'text-muted');
+        }
+      });
+    }
+
+    stars.forEach(star => {
+      star.addEventListener('change', function() {
+        updateStars(this.value);
+      });
+    });
+
+    // Hover effects
+    document.querySelectorAll('.star-label').forEach((label, index) => {
+      label.addEventListener('mouseenter', () => {
+        labels.forEach((icon, i) => {
+          if (i <= index) {
+            icon.classList.remove('bi-star', 'text-muted');
+            icon.classList.add('bi-star-fill', 'text-warning');
+          }
+        });
+      });
+
+      label.addEventListener('mouseleave', () => {
+        const checked = document.querySelector('.star-rating input:checked');
+        updateStars(checked ? checked.value : 0);
+      });
+    });
+  });
+</script>

@@ -11,6 +11,7 @@ Rails.application.routes.draw do
         post :reject
       end
     end
+    resources :ratings, only: [:new, :create]
   end
 
   resources :conversations, only: [:index, :show, :create] do

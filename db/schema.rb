@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_02_16_132450) do
+ActiveRecord::Schema[7.1].define(version: 2026_02_19_161823) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -100,6 +100,20 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_16_132450) do
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
+  create_table "ratings", force: :cascade do |t|
+    t.bigint "trip_id", null: false
+    t.bigint "reviewer_id", null: false
+    t.bigint "rated_user_id", null: false
+    t.integer "rating", null: false
+    t.text "comment"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["rated_user_id"], name: "index_ratings_on_rated_user_id"
+    t.index ["reviewer_id"], name: "index_ratings_on_reviewer_id"
+    t.index ["trip_id", "reviewer_id", "rated_user_id"], name: "index_ratings_on_trip_id_and_reviewer_id_and_rated_user_id", unique: true
+    t.index ["trip_id"], name: "index_ratings_on_trip_id"
+  end
+
   create_table "trips", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "destination_id"
@@ -144,6 +158,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_16_132450) do
   add_foreign_key "messages", "conversations"
   add_foreign_key "messages", "users"
   add_foreign_key "notifications", "users"
+  add_foreign_key "ratings", "trips"
+  add_foreign_key "ratings", "users", column: "rated_user_id"
+  add_foreign_key "ratings", "users", column: "reviewer_id"
   add_foreign_key "trips", "destinations"
   add_foreign_key "trips", "users"
 end
