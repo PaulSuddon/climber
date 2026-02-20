@@ -5,13 +5,3 @@ test:
 local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
-
-# Supabase Storage (S3-compatible)
-supabase:
-  service: S3
-  access_key_id: <%= ENV["SUPABASE_ACCESS_KEY_ID"] %>
-  secret_access_key: <%= ENV["SUPABASE_SECRET_ACCESS_KEY"] %>
-  region: us-east-1
-  bucket: avatars
-  endpoint: https://<%= ENV["SUPABASE_PROJECT_ID"] %>.supabase.co/storage/v1/s3
-  force_path_style: true
