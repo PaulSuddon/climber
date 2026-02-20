@@ -1,0 +1,118 @@
+<div class="mb-4">
+  <h1 class="fw-bold">
+    <i class="bi bi-bar-chart-fill text-primary me-2"></i>Admin Stats
+  </h1>
+  <p class="text-muted">Overview of your app</p>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-5">
+  <div class="col-md-4 col-lg-2">
+    <div class="card text-center h-100">
+      <div class="card-body">
+        <i class="bi bi-people-fill text-primary" style="font-size: 2rem;"></i>
+        <h2 class="mt-2 mb-0"><%= @user_count %></h2>
+        <p class="text-muted mb-0">Users</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 col-lg-2">
+    <div class="card text-center h-100">
+      <div class="card-body">
+        <i class="bi bi-car-front-fill text-success" style="font-size: 2rem;"></i>
+        <h2 class="mt-2 mb-0"><%= @trip_count %></h2>
+        <p class="text-muted mb-0">Trips</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 col-lg-2">
+    <div class="card text-center h-100">
+      <div class="card-body">
+        <i class="bi bi-ticket-perforated-fill text-info" style="font-size: 2rem;"></i>
+        <h2 class="mt-2 mb-0"><%= @booking_count %></h2>
+        <p class="text-muted mb-0">Bookings</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 col-lg-2">
+    <div class="card text-center h-100">
+      <div class="card-body">
+        <i class="bi bi-geo-alt-fill text-danger" style="font-size: 2rem;"></i>
+        <h2 class="mt-2 mb-0"><%= @destination_count %></h2>
+        <p class="text-muted mb-0">Destinations</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 col-lg-2">
+    <div class="card text-center h-100">
+      <div class="card-body">
+        <i class="bi bi-star-fill text-warning" style="font-size: 2rem;"></i>
+        <h2 class="mt-2 mb-0"><%= @rating_count %></h2>
+        <p class="text-muted mb-0">Ratings</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Recent Users -->
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-people me-2"></i>Recent Users</h5>
+      </div>
+      <ul class="list-group list-group-flush">
+        <% @recent_users.each do |user| %>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <strong><%= user.name %></strong>
+              <br>
+              <small class="text-muted"><%= user.email %></small>
+            </div>
+            <small class="text-muted"><%= user.created_at.strftime("%b %d") %></small>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Recent Trips -->
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-car-front me-2"></i>Recent Trips</h5>
+      </div>
+      <ul class="list-group list-group-flush">
+        <% @recent_trips.each do |trip| %>
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between">
+              <strong><%= trip.display_name.truncate(20) %></strong>
+              <span class="badge bg-<%= trip.status == 'open' ? 'success' : 'secondary' %>"><%= trip.status %></span>
+            </div>
+            <small class="text-muted">by <%= trip.user.name %> - <%= trip.created_at.strftime("%b %d") %></small>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Recent Bookings -->
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-ticket-perforated me-2"></i>Recent Bookings</h5>
+      </div>
+      <ul class="list-group list-group-flush">
+        <% @recent_bookings.each do |booking| %>
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between">
+              <strong><%= booking.user.name %></strong>
+              <span class="badge bg-<%= booking.status == 'confirmed' ? 'success' : (booking.status == 'pending' ? 'warning' : 'secondary') %>"><%= booking.status %></span>
+            </div>
+            <small class="text-muted"><%= booking.trip.display_name.truncate(25) %></small>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</div>
