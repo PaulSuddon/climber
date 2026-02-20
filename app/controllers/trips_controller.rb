@@ -30,6 +30,7 @@ class TripsController < ApplicationController
 
   def new
     @trip = current_user.trips.build
+    @destinations = Destination.all.order(:name)
   end
 
   def create
@@ -43,6 +44,7 @@ class TripsController < ApplicationController
   end
 
   def edit
+    @destinations = Destination.all.order(:name)
   end
 
   def update
