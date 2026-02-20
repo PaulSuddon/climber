@@ -10,6 +10,7 @@ class Trip < ApplicationRecord
 
   validates :departure_date, presence: true
   validates :departure_location, presence: true
+  validate :departure_date_cannot_be_in_past, on: :create
   validates :available_seats, presence: true, numericality: { greater_than: 0 }
   validates :price_per_seat, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :destination_name, presence: true
@@ -53,5 +54,13 @@ class Trip < ApplicationRecord
 
   def hiking?
     activity_type == "hiking" || destination&.hiking?
+  end
+
+  private
+
+  def departure_date_cannot_be_in_past
+    if departure_date.present? && departure_date < Time.current
+      errors.add(:departure_date, "can't be in the past")
+    end
   end
 end
