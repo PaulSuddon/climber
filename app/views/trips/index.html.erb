@@ -66,14 +66,14 @@
               <img src="<%= trip.display_image_url %>" alt="<%= trip.display_name %>" style="width: 100%; height: 100%; object-fit: cover;">
             <% else %>
               <div class="<%= trip.climbing? ? 'climbing-bg' : 'hiking-bg' %> h-100 d-flex align-items-center justify-content-center">
-                <i class="bi <%= trip.climbing? ? 'fa-solid fa-hand-fist' : 'fa-solid fa-person-hiking' %>" style="font-size: 4rem; color: rgba(255,255,255,0.8);"></i>
+                <span style="font-size: 4rem;"><%= trip.climbing? ? '🧗' : '🥾' %></span>
               </div>
             <% end %>
             <span class="badge bg-light text-dark position-absolute" style="top: 12px; right: 12px;">
               <i class="bi bi-people-fill me-1"></i><%= trip.seats_remaining %> seats
             </span>
             <span class="badge <%= trip.climbing? ? 'bg-warning' : 'bg-success' %> position-absolute" style="bottom: 12px; left: 12px;">
-              <i class="bi <%= trip.climbing? ? 'fa-solid fa-hand-fist' : 'fa-solid fa-person-hiking' %> me-1"></i>
+              <%= trip.climbing? ? '🧗' : '🥾' %>
               <%= trip.climbing? ? 'Climbing' : 'Hiking' %>
             </span>
           </div>
