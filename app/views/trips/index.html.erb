@@ -26,7 +26,10 @@
         <%= label_tag :destination, class: "form-label" do %>
           <i class="bi bi-geo-alt me-1"></i> Destination
         <% end %>
-        <%= text_field_tag :destination, params[:destination], class: "form-control", placeholder: "Search by name..." %>
+        <%= select_tag :destination, options_for_select(
+          [["All Destinations", ""]] + @destinations.map { |d| [d.name, d.name] },
+          params[:destination]
+        ), class: "form-select" %>
       </div>
       <div class="col-md-2">
         <%= label_tag :date, class: "form-label" do %>

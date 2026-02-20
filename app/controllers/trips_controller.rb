@@ -5,13 +5,14 @@ class TripsController < ApplicationController
 
   def index
     @trips = Trip.available.includes(:destination, :user)
+    @destinations = Destination.all.order(:name)
 
     if params[:activity_type].present?
       @trips = @trips.where(activity_type: params[:activity_type])
     end
 
     if params[:destination].present?
-      @trips = @trips.where("destination_name ILIKE ?", "%#{params[:destination]}%")
+      @trips = @trips.where(destination_name: params[:destination])
     end
 
     if params[:date].present?
