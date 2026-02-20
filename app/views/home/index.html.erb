@@ -2,7 +2,7 @@
 <div class="hero-section text-white mb-5">
   <div class="hero-content text-center">
     <h1 class="display-4 mb-3">
-      <i class="bi bi-mountain"></i> Climber
+      Climber
     </h1>
     <p class="lead mb-4">Share rides to the best climbing and hiking spots</p>
     <p class="mb-4">Join our community of outdoor enthusiasts. Save money, make friends, and reduce your carbon footprint.</p>
@@ -29,10 +29,10 @@
     <div class="card activity-card climbing h-100">
       <div class="card-body text-center py-5">
         <div class="activity-icon">
-          <i class="bi bi-mountain"></i>
+          <i class="bi bi-triangle-fill"></i>
         </div>
         <h3 class="fw-bold mb-3">Climbing</h3>
-        <p class="mb-4">Find rides to <%= @climbing_count %> climbing destinations including La Pedriza, Patones, La Cabrera, and more.</p>
+        <p class="mb-4">Find rides to climbing destinations including La Pedriza, Patones, La Cabrera, and more.</p>
         <%= link_to trips_path(activity_type: "climbing"), class: "btn btn-light btn-lg" do %>
           <i class="bi bi-arrow-right me-2"></i>Explore Climbing Trips
         <% end %>
@@ -46,7 +46,7 @@
           <i class="bi bi-signpost-split"></i>
         </div>
         <h3 class="fw-bold mb-3">Hiking</h3>
-        <p class="mb-4">Find rides to <%= @hiking_count %> hiking destinations including Penalara, Siete Picos, El Yelmo, and more.</p>
+        <p class="mb-4">Find rides to hiking destinations including Penalara, Siete Picos, El Yelmo, and more.</p>
         <%= link_to trips_path(activity_type: "hiking"), class: "btn btn-light btn-lg" do %>
           <i class="bi bi-arrow-right me-2"></i>Explore Hiking Trips
         <% end %>
@@ -76,14 +76,14 @@
                 <img src="<%= trip.display_image_url %>" alt="<%= trip.display_name %>" style="width: 100%; height: 100%; object-fit: cover;">
               <% else %>
                 <div class="<%= trip.climbing? ? 'climbing-bg' : 'hiking-bg' %> h-100 d-flex align-items-center justify-content-center">
-                  <i class="bi <%= trip.climbing? ? 'bi-mountain' : 'bi-signpost-split' %>" style="font-size: 4rem; color: rgba(255,255,255,0.8);"></i>
+                  <i class="bi <%= trip.climbing? ? 'bi-geo-alt-fill' : 'bi-signpost-split' %>" style="font-size: 4rem; color: rgba(255,255,255,0.8);"></i>
                 </div>
               <% end %>
               <span class="badge bg-light text-dark position-absolute" style="top: 12px; right: 12px;">
                 <i class="bi bi-people-fill me-1"></i><%= trip.seats_remaining %> seats
               </span>
               <span class="badge <%= trip.climbing? ? 'bg-warning' : 'bg-success' %> position-absolute" style="bottom: 12px; left: 12px;">
-                <i class="bi <%= trip.climbing? ? 'bi-mountain' : 'bi-signpost-split' %> me-1"></i>
+                <i class="bi <%= trip.climbing? ? 'bi-geo-alt-fill' : 'bi-signpost-split' %> me-1"></i>
                 <%= trip.climbing? ? 'Climbing' : 'Hiking' %>
               </span>
             </div>
@@ -242,7 +242,7 @@
                 <img src="<%= destination.image_url %>" alt="<%= destination.name %>" style="width: 100%; height: 100%; object-fit: cover;">
               <% else %>
                 <div class="<%= destination.climbing? ? 'climbing-bg' : 'hiking-bg' %> h-100 d-flex align-items-center justify-content-center">
-                  <i class="bi <%= destination.climbing? ? 'bi-mountain' : 'bi-signpost-split' %>" style="font-size: 3rem; color: rgba(255,255,255,0.8);"></i>
+                  <i class="bi <%= destination.climbing? ? 'bi-geo-alt-fill' : 'bi-signpost-split' %>" style="font-size: 3rem; color: rgba(255,255,255,0.8);"></i>
                 </div>
               <% end %>
               <% if destination.difficulty_level.present? %>
