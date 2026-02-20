@@ -24,132 +24,63 @@
         <div class="card-body">
           <div class="mb-3">
             <label class="form-label">
-              <i class="bi bi-pin-map me-1"></i> Select Destination
+              <i class="bi bi-pin-map me-1"></i> Destination Area
             </label>
-            <select id="destination_select" class="form-select form-select-lg">
-              <option value="">Choose a popular destination...</option>
-              <optgroup label="Climbing">
-                <% @destinations.select { |d| d.climbing? }.each do |dest| %>
-                  <option value="<%= dest.id %>"
-                          data-name="<%= dest.name %>"
-                          data-address="<%= dest.address %>"
-                          data-activity="climbing"
-                          <%= 'selected' if trip.destination_name == dest.name %>>
-                    <%= dest.name %>
-                  </option>
-                <% end %>
-              </optgroup>
-              <optgroup label="Hiking">
-                <% @destinations.select { |d| d.hiking? }.each do |dest| %>
-                  <option value="<%= dest.id %>"
-                          data-name="<%= dest.name %>"
-                          data-address="<%= dest.address %>"
-                          data-activity="hiking"
-                          <%= 'selected' if trip.destination_name == dest.name %>>
-                    <%= dest.name %>
-                  </option>
-                <% end %>
-              </optgroup>
-              <optgroup label="Other">
-                <option value="other" <%= 'selected' if trip.destination_name.present? && @destinations.none? { |d| d.name == trip.destination_name } %>>
-                  Other (enter custom destination)
-                </option>
-              </optgroup>
-            </select>
+            <%= f.select :destination_name,
+                options_for_select(
+                  [["Choose a destination...", ""]] +
+                  @destinations.group_by(&:activity_type).flat_map { |type, dests|
+                    [[type.capitalize, nil, { disabled: true }]] + dests.map { |d| [d.name, d.name, { "data-activity": d.activity_type }] }
+                  },
+                  trip.destination_name
+                ),
+                {},
+                { class: "form-select form-select-lg", id: "destination_select" } %>
           </div>
 
-          <div id="custom_destination_fields" class="<%= 'visually-hidden' unless trip.destination_name.present? && @destinations.none? { |d| d.name == trip.destination_name } %>">
-            <div class="mb-3">
-              <%= f.label :destination_name, class: "form-label" do %>
-                <i class="bi bi-pencil me-1"></i> Custom Destination Name
-              <% end %>
-              <%= f.text_field :destination_name, class: "form-control", placeholder: "Enter destination name...", id: "custom_destination_name" %>
-            </div>
-
-            <div class="mb-3">
-              <%= f.label :destination_address, class: "form-label" do %>
-                <i class="bi bi-signpost-2 me-1"></i> Location / Area
-              <% end %>
-              <%= f.text_field :destination_address, class: "form-control", placeholder: "e.g., Sierra de Guadarrama", id: "custom_destination_address" %>
-            </div>
-
-            <div class="mb-0">
-              <%= f.label :activity_type, class: "form-label" do %>
-                <i class="bi bi-signpost-split me-1"></i> Activity Type
-              <% end %>
-              <div class="row g-3">
-                <div class="col-6">
-                  <div class="form-check card p-3 h-100" style="cursor: pointer;">
-                    <%= f.radio_button :activity_type, "climbing", class: "form-check-input", id: "activity_climbing" %>
-                    <%= f.label :activity_type, class: "form-check-label d-flex align-items-center", for: "activity_climbing", style: "cursor: pointer;" do %>
-                      <i class="bi bi-signpost-split text-warning me-2" style="font-size: 1.5rem;"></i>
-                      <strong>Climbing</strong>
-                    <% end %>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="form-check card p-3 h-100" style="cursor: pointer;">
-                    <%= f.radio_button :activity_type, "hiking", class: "form-check-input", id: "activity_hiking" %>
-                    <%= f.label :activity_type, class: "form-check-label d-flex align-items-center", for: "activity_hiking", style: "cursor: pointer;" do %>
-                      <i class="bi bi-tree text-success me-2" style="font-size: 1.5rem;"></i>
-                      <strong>Hiking</strong>
-                    <% end %>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="bi bi-signpost-2 me-1"></i> Route / Trail Name
+            </label>
+            <%= f.text_field :destination_address, class: "form-control", placeholder: "e.g., El Yelmo summit, Via Ferrata route, North face..." %>
+            <div class="form-text">Specify the exact route, trail, or area you're heading to</div>
           </div>
 
-          <%= f.hidden_field :destination_name, id: "hidden_destination_name" %>
-          <%= f.hidden_field :destination_address, id: "hidden_destination_address" %>
           <%= f.hidden_field :activity_type, id: "hidden_activity_type" %>
         </div>
       </div>
 
       <script>
-        document.addEventListener('DOMContentLoaded', function() {
-          const select = document.getElementById('destination_select');
-          const customFields = document.getElementById('custom_destination_fields');
-          const hiddenName = document.getElementById('hidden_destination_name');
-          const hiddenAddress = document.getElementById('hidden_destination_address');
-          const hiddenActivity = document.getElementById('hidden_activity_type');
-          const customName = document.getElementById('custom_destination_name');
-          const customAddress = document.getElementById('custom_destination_address');
+        (function() {
+          function initDestinationForm() {
+            const select = document.getElementById('destination_select');
+            const hiddenActivity = document.getElementById('hidden_activity_type');
 
-          function updateFields() {
-            const option = select.options[select.selectedIndex];
+            if (!select) return;
 
-            if (option.value === 'other') {
-              customFields.classList.remove('visually-hidden');
-              // Sync custom fields to hidden fields
-              if (customName) {
-                hiddenName.value = customName.value;
-                customName.addEventListener('input', () => hiddenName.value = customName.value);
+            function updateActivity() {
+              const option = select.options[select.selectedIndex];
+              if (option && option.dataset && option.dataset.activity) {
+                hiddenActivity.value = option.dataset.activity;
               }
-              if (customAddress) {
-                hiddenAddress.value = customAddress.value;
-                customAddress.addEventListener('input', () => hiddenAddress.value = customAddress.value);
-              }
-            } else if (option.value === '') {
-              customFields.classList.add('visually-hidden');
-              hiddenName.value = '';
-              hiddenAddress.value = '';
-              hiddenActivity.value = '';
-            } else {
-              customFields.classList.add('visually-hidden');
-              hiddenName.value = option.dataset.name;
-              hiddenAddress.value = option.dataset.address;
-              hiddenActivity.value = option.dataset.activity;
             }
+
+            select.addEventListener('change', updateActivity);
+
+            // Initialize on load
+            updateActivity();
           }
 
-          select.addEventListener('change', updateFields);
-
-          // Initialize on page load
-          if (select.value && select.value !== '' && select.value !== 'other') {
-            updateFields();
+          // Run immediately if DOM is ready, otherwise wait
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initDestinationForm);
+          } else {
+            initDestinationForm();
           }
-        });
+
+          // Also run on Turbo navigation
+          document.addEventListener('turbo:load', initDestinationForm);
+        })();
       </script>
 
       <!-- Trip Details -->
