@@ -64,17 +64,32 @@
       </div>
 
       <script>
-        document.addEventListener("DOMContentLoaded", function() {
-          var map = L.map('map').setView([<%= @destination.latitude %>, <%= @destination.longitude %>], 12);
+        (function() {
+          function initMap() {
+            var mapElement = document.getElementById('map');
+            if (!mapElement || mapElement._leaflet_id) return;
 
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          }).addTo(map);
+            var map = L.map('map').setView([<%= @destination.latitude %>, <%= @destination.longitude %>], 12);
 
-          var marker = L.marker([<%= @destination.latitude %>, <%= @destination.longitude %>]).addTo(map);
-          marker.bindPopup('<strong><%= j @destination.name %></strong><br><small><%= j @destination.address %></small>').openPopup();
-        });
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              maxZoom: 19,
+              attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            var marker = L.marker([<%= @destination.latitude %>, <%= @destination.longitude %>]).addTo(map);
+            marker.bindPopup('<strong><%= j @destination.name %></strong><br><small><%= j @destination.address %></small>').openPopup();
+          }
+
+          // Run on initial page load
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initMap);
+          } else {
+            initMap();
+          }
+
+          // Run on Turbo navigation
+          document.addEventListener('turbo:load', initMap);
+        })();
       </script>
     <% end %>
   </div>
